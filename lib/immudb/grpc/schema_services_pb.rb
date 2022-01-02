@@ -18,6 +18,7 @@
 #
 
 require 'grpc'
+require_relative 'schema_pb'
 
 module Immudb
   module Schema

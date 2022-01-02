@@ -10,9 +10,10 @@ end
 
 task :generate do
   system "grpc_tools_ruby_protoc -I grpc --ruby_out=lib/immudb/grpc --grpc_out=lib/immudb/grpc grpc/schema.proto"
+
+  # use require_relative
+  # https://github.com/grpc/grpc/issues/6164
   Dir["lib/immudb/grpc/*_pb.rb"].each do |file|
-    contents = File.read(file)
-    # remove relative *_pb requires
-    File.write(file, contents.gsub(/require '\w+_pb'\n/m, ""))
+    File.write(file, File.read(file).gsub(/require '(\w+)_pb'/, "require_relative '\\1_pb'"))
   end
 end

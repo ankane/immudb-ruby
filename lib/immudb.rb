@@ -4,7 +4,6 @@ require "openssl"
 require "time"
 
 # grpc
-require "immudb/grpc/schema_pb"
 require "immudb/grpc/schema_services_pb"
 
 # modules
