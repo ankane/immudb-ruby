@@ -55,6 +55,8 @@ immudb.verified_set("hello", "world")
 immudb.verified_get("hello")
 ```
 
+Note: verified methods don’t work with immudb 1.2.1+ yet
+
 Set and get multiple keys
 
 ```ruby
