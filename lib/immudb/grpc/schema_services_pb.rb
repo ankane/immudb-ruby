@@ -24,7 +24,6 @@ module Immudb
   module Schema
     module ImmuService
       # immudb gRPC & REST service
-      # IMPORTANT: All get and safeget functions return base64-encoded keys and values, while all set and safeset functions expect base64-encoded inputs.
       class Service
 
         include ::GRPC::GenericService
@@ -36,47 +35,74 @@ module Immudb
         rpc :ListUsers, ::Google::Protobuf::Empty, ::Immudb::Schema::UserList
         rpc :CreateUser, ::Immudb::Schema::CreateUserRequest, ::Google::Protobuf::Empty
         rpc :ChangePassword, ::Immudb::Schema::ChangePasswordRequest, ::Google::Protobuf::Empty
+        rpc :ChangePermission, ::Immudb::Schema::ChangePermissionRequest, ::Google::Protobuf::Empty
+        rpc :SetActiveUser, ::Immudb::Schema::SetActiveUserRequest, ::Google::Protobuf::Empty
         rpc :UpdateAuthConfig, ::Immudb::Schema::AuthConfig, ::Google::Protobuf::Empty
+        # DEPRECATED
         rpc :UpdateMTLSConfig, ::Immudb::Schema::MTLSConfig, ::Google::Protobuf::Empty
+        # DEPRECATED
+        rpc :OpenSession, ::Immudb::Schema::OpenSessionRequest, ::Immudb::Schema::OpenSessionResponse
+        rpc :CloseSession, ::Google::Protobuf::Empty, ::Google::Protobuf::Empty
+        rpc :KeepAlive, ::Google::Protobuf::Empty, ::Google::Protobuf::Empty
+        rpc :NewTx, ::Immudb::Schema::NewTxRequest, ::Immudb::Schema::NewTxResponse
+        rpc :Commit, ::Google::Protobuf::Empty, ::Immudb::Schema::CommittedSQLTx
+        rpc :Rollback, ::Google::Protobuf::Empty, ::Google::Protobuf::Empty
+        rpc :TxSQLExec, ::Immudb::Schema::SQLExecRequest, ::Google::Protobuf::Empty
+        rpc :TxSQLQuery, ::Immudb::Schema::SQLQueryRequest, ::Immudb::Schema::SQLQueryResult
         rpc :Login, ::Immudb::Schema::LoginRequest, ::Immudb::Schema::LoginResponse
         rpc :Logout, ::Google::Protobuf::Empty, ::Google::Protobuf::Empty
-        rpc :Set, ::Immudb::Schema::SetRequest, ::Immudb::Schema::TxMetadata
+        rpc :Set, ::Immudb::Schema::SetRequest, ::Immudb::Schema::TxHeader
         rpc :VerifiableSet, ::Immudb::Schema::VerifiableSetRequest, ::Immudb::Schema::VerifiableTx
         rpc :Get, ::Immudb::Schema::KeyRequest, ::Immudb::Schema::Entry
         rpc :VerifiableGet, ::Immudb::Schema::VerifiableGetRequest, ::Immudb::Schema::VerifiableEntry
+        rpc :Delete, ::Immudb::Schema::DeleteKeysRequest, ::Immudb::Schema::TxHeader
         rpc :GetAll, ::Immudb::Schema::KeyListRequest, ::Immudb::Schema::Entries
-        rpc :ExecAll, ::Immudb::Schema::ExecAllRequest, ::Immudb::Schema::TxMetadata
+        rpc :ExecAll, ::Immudb::Schema::ExecAllRequest, ::Immudb::Schema::TxHeader
         rpc :Scan, ::Immudb::Schema::ScanRequest, ::Immudb::Schema::Entries
+        # NOT YET SUPPORTED
         rpc :Count, ::Immudb::Schema::KeyPrefix, ::Immudb::Schema::EntryCount
+        # NOT YET SUPPORTED
         rpc :CountAll, ::Google::Protobuf::Empty, ::Immudb::Schema::EntryCount
         rpc :TxById, ::Immudb::Schema::TxRequest, ::Immudb::Schema::Tx
         rpc :VerifiableTxById, ::Immudb::Schema::VerifiableTxRequest, ::Immudb::Schema::VerifiableTx
         rpc :TxScan, ::Immudb::Schema::TxScanRequest, ::Immudb::Schema::TxList
         rpc :History, ::Immudb::Schema::HistoryRequest, ::Immudb::Schema::Entries
         rpc :Health, ::Google::Protobuf::Empty, ::Immudb::Schema::HealthResponse
+        rpc :DatabaseHealth, ::Google::Protobuf::Empty, ::Immudb::Schema::DatabaseHealthResponse
         rpc :CurrentState, ::Google::Protobuf::Empty, ::Immudb::Schema::ImmutableState
-        rpc :SetReference, ::Immudb::Schema::ReferenceRequest, ::Immudb::Schema::TxMetadata
+        rpc :SetReference, ::Immudb::Schema::ReferenceRequest, ::Immudb::Schema::TxHeader
         rpc :VerifiableSetReference, ::Immudb::Schema::VerifiableReferenceRequest, ::Immudb::Schema::VerifiableTx
-        rpc :ZAdd, ::Immudb::Schema::ZAddRequest, ::Immudb::Schema::TxMetadata
+        rpc :ZAdd, ::Immudb::Schema::ZAddRequest, ::Immudb::Schema::TxHeader
         rpc :VerifiableZAdd, ::Immudb::Schema::VerifiableZAddRequest, ::Immudb::Schema::VerifiableTx
         rpc :ZScan, ::Immudb::Schema::ZScanRequest, ::Immudb::Schema::ZEntries
+        # DEPRECATED: kept for backward compatibility
         rpc :CreateDatabase, ::Immudb::Schema::Database, ::Google::Protobuf::Empty
+        rpc :CreateDatabaseWith, ::Immudb::Schema::DatabaseSettings, ::Google::Protobuf::Empty
+        rpc :CreateDatabaseV2, ::Immudb::Schema::CreateDatabaseRequest, ::Immudb::Schema::CreateDatabaseResponse
+        rpc :LoadDatabase, ::Immudb::Schema::LoadDatabaseRequest, ::Immudb::Schema::LoadDatabaseResponse
+        rpc :UnloadDatabase, ::Immudb::Schema::UnloadDatabaseRequest, ::Immudb::Schema::UnloadDatabaseResponse
+        rpc :DeleteDatabase, ::Immudb::Schema::DeleteDatabaseRequest, ::Immudb::Schema::DeleteDatabaseResponse
         rpc :DatabaseList, ::Google::Protobuf::Empty, ::Immudb::Schema::DatabaseListResponse
+        rpc :DatabaseListV2, ::Immudb::Schema::DatabaseListRequestV2, ::Immudb::Schema::DatabaseListResponseV2
         rpc :UseDatabase, ::Immudb::Schema::Database, ::Immudb::Schema::UseDatabaseReply
+        rpc :UpdateDatabase, ::Immudb::Schema::DatabaseSettings, ::Google::Protobuf::Empty
+        rpc :UpdateDatabaseV2, ::Immudb::Schema::UpdateDatabaseRequest, ::Immudb::Schema::UpdateDatabaseResponse
+        rpc :GetDatabaseSettings, ::Google::Protobuf::Empty, ::Immudb::Schema::DatabaseSettings
+        rpc :GetDatabaseSettingsV2, ::Immudb::Schema::DatabaseSettingsRequest, ::Immudb::Schema::DatabaseSettingsResponse
+        rpc :FlushIndex, ::Immudb::Schema::FlushIndexRequest, ::Immudb::Schema::FlushIndexResponse
         rpc :CompactIndex, ::Google::Protobuf::Empty, ::Google::Protobuf::Empty
-        rpc :ChangePermission, ::Immudb::Schema::ChangePermissionRequest, ::Google::Protobuf::Empty
-        rpc :SetActiveUser, ::Immudb::Schema::SetActiveUserRequest, ::Google::Protobuf::Empty
         # Streams
         rpc :streamGet, ::Immudb::Schema::KeyRequest, stream(::Immudb::Schema::Chunk)
-        rpc :streamSet, stream(::Immudb::Schema::Chunk), ::Immudb::Schema::TxMetadata
+        rpc :streamSet, stream(::Immudb::Schema::Chunk), ::Immudb::Schema::TxHeader
         rpc :streamVerifiableGet, ::Immudb::Schema::VerifiableGetRequest, stream(::Immudb::Schema::Chunk)
         rpc :streamVerifiableSet, stream(::Immudb::Schema::Chunk), ::Immudb::Schema::VerifiableTx
         rpc :streamScan, ::Immudb::Schema::ScanRequest, stream(::Immudb::Schema::Chunk)
         rpc :streamZScan, ::Immudb::Schema::ZScanRequest, stream(::Immudb::Schema::Chunk)
         rpc :streamHistory, ::Immudb::Schema::HistoryRequest, stream(::Immudb::Schema::Chunk)
-        rpc :streamExecAll, stream(::Immudb::Schema::Chunk), ::Immudb::Schema::TxMetadata
-        # SQL
-        rpc :UseSnapshot, ::Immudb::Schema::UseSnapshotRequest, ::Google::Protobuf::Empty
+        rpc :streamExecAll, stream(::Immudb::Schema::Chunk), ::Immudb::Schema::TxHeader
+        # Replication
+        rpc :exportTx, ::Immudb::Schema::ExportTxRequest, stream(::Immudb::Schema::Chunk)
+        rpc :replicateTx, stream(::Immudb::Schema::Chunk), ::Immudb::Schema::TxHeader
         rpc :SQLExec, ::Immudb::Schema::SQLExecRequest, ::Immudb::Schema::SQLExecResult
         rpc :SQLQuery, ::Immudb::Schema::SQLQueryRequest, ::Immudb::Schema::SQLQueryResult
         rpc :ListTables, ::Google::Protobuf::Empty, ::Immudb::Schema::SQLQueryResult
