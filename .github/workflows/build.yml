@@ -2,12 +2,20 @@ name: build
 on: [push, pull_request]
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - ruby: 3.1
+          immudb: 1.3.0
+        - ruby: 2.7
+          immudb: 1.1.0
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.1
+        ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
     - run: |
         wget https://github.com/codenotary/immudb/releases/download/v$IMMUDB_VERSION/immudb-v$IMMUDB_VERSION-linux-amd64
@@ -15,5 +23,5 @@ jobs:
         chmod +x immudb
         ./immudb -d
       env:
-        IMMUDB_VERSION: 1.3.0
+        IMMUDB_VERSION: ${{ matrix.immudb }}
     - run: bundle exec rake test
