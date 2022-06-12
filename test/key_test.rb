@@ -8,12 +8,16 @@ class KeyTest < Minitest::Test
   end
 
   def test_verified_get_verified_set
+    skip # TODO support immudb 1.2.1+ verification
+
     key = random_key
     assert_nil immudb.verified_set(key, "world")
     assert_equal "world", immudb.verified_get(key)
   end
 
   def test_verified_get_verified_get_multiple_clients
+    skip # TODO support immudb 1.2.1+ verification
+
     key = random_key
     assert_nil immudb.verified_set(key, "world")
     assert_nil immudb2.verified_set(key, "world2")
