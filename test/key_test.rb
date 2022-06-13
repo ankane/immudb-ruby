@@ -33,6 +33,20 @@ class KeyTest < Minitest::Test
     end
   end
 
+  def test_expiration
+    key = random_key
+    metadata = Immudb::KVMetadata.new
+    metadata.expires_at(Time.now + 1)
+    assert_nil immudb.verified_set(key, "world", metadata: metadata)
+
+    sleep(1)
+
+    error = assert_raises(Immudb::Error) do
+      immudb.verified_get(key)
+    end
+    assert_equal "key not found: expired entry", error.message
+  end
+
   def test_get_all_set_all
     kv = {random_key => "one", random_key => "two"}
     assert_nil immudb.set_all(kv)
