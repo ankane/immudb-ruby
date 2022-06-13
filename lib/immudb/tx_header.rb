@@ -37,11 +37,7 @@ module Immudb
       elsif @version == 1
         mdbs = "".b
         if !@metadata.nil?
-          raise "Not supported yet"
-          # mdbs = @metadata.Bytes()
-          # if mdbs.nil?
-          #   mdbs = "".b
-          # end
+          mdbs = @metadata.bytes
         end
         md.update([mdbs.length].pack("n"))
         md.update(mdbs)
