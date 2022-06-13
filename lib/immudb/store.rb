@@ -97,8 +97,7 @@ module Immudb
       def entry_spec_digest_v1(kv)
         mdbs = "".b
         if !kv.metadata.nil?
-          raise "Not supported yet"
-          # mdbs = kv.metadata.Bytes()
+          mdbs = kv.metadata.bytes
         end
         mdLen = mdbs.length
         kLen = kv.key.length

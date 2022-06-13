@@ -76,10 +76,10 @@ module Immudb
       nil
     end
 
-    # TODO add metadata
-    def verified_set(key, value)
+    def verified_set(key, value, metadata: nil)
+      schema_metadata = metadata_to_proto(metadata)
       state = @rs.get
-      kv = Schema::KeyValue.new(key: key, value: value)
+      kv = Schema::KeyValue.new(key: key, value: value, metadata: schema_metadata)
 
       raw_request = Schema::VerifiableSetRequest.new(
         setRequest: Schema::SetRequest.new(KVs: [kv]),
@@ -94,7 +94,7 @@ module Immudb
       inclusion_proof = tx.proof(Database.encode_key(key))
       md = tx.entries[0].metadata
 
-      if !md.nil? && md.deleted
+      if !md.nil? && md.deleted?
         raise VerificationError
       end
 
@@ -130,7 +130,7 @@ module Immudb
         txId: target_id,
         txHash: target_alh,
         publicKey: verifiable_tx.signature&.publicKey,
-        signature: verifiable_tx.signature&.signature,
+        signature: verifiable_tx.signature&.signature
       )
       if !verifying_key.nil?
         newstate.verify(verifying_key)
@@ -378,6 +378,23 @@ module Immudb
       else
         name
       end
+    end
+
+    def metadata_to_proto(metadata)
+      schema_metadata = nil
+      if metadata
+        schema_metadata = Schema::KVMetadata.new
+        if metadata.deleted?
+          schema_metadata.deleted = true
+        end
+        if metadata.expirable?
+          schema_metadata.expiration = Schema::Expiration.new(expiresAt: metadata.expiration_time.to_i)
+        end
+        if metadata.non_indexable?
+          schema_metadata.nonIndexable = true
+        end
+      end
+      schema_metadata
     end
   end
 end

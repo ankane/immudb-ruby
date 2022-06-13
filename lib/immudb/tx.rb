@@ -65,7 +65,7 @@ module Immudb
     def tx_entry_digest_v1_1(e)
       unless e.md.nil?
         # TODO raise ErrMetadataUnsupported
-        raise VerificationError
+        raise Error, "Metadata not supported"
       end
       md = Digest::SHA256.new
       md.update(e.k)
@@ -76,8 +76,7 @@ module Immudb
     def tx_entry_digest_v1_2(e)
       mdbs = "".b
       if !e.md.nil?
-        raise "Not supported yet"
-        # mdbs = e.md.Bytes()
+        mdbs = e.md.bytes
       end
       mdLen = mdbs.length
       b = "".b

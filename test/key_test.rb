@@ -21,6 +21,18 @@ class KeyTest < Minitest::Test
     assert_equal "world2", immudb2.verified_get(key)
   end
 
+  def test_verified_set_metadata
+    key = random_key
+    metadata = Immudb::KVMetadata.new
+    metadata.expires_at(Time.now + 5)
+    metadata.as_non_indexable(true)
+    assert_nil immudb.verified_set(key, "world", metadata: metadata)
+    metadata.as_deleted(true)
+    assert_raises(Immudb::VerificationError) do
+      immudb.verified_set(key, "world", metadata: metadata)
+    end
+  end
+
   def test_get_all_set_all
     kv = {random_key => "one", random_key => "two"}
     assert_nil immudb.set_all(kv)

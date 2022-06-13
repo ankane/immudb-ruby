@@ -48,12 +48,11 @@ module Immudb
 
       def kv_metadata_from_proto(md)
         return nil if md.nil?
-        raise "Not supported yet"
-        kvmd = KVMetadata.new()
+        kvmd = ::Immudb::KVMetadata.new()
         kvmd.as_deleted(md.deleted)
 
-        if md.HasField("expiration")
-          kvmd.expires_at(datetime.utcfromtimestamp(md.expiration.expiresAt))
+        unless md.expiration.nil?
+          kvmd.expires_at(Time.at(md.expiration.expiresAt))
         end
 
         kvmd.as_non_indexable(md.nonIndexable)
