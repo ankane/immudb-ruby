@@ -29,7 +29,9 @@ class KeyTest < Minitest::Test
     metadata.expires_at(Time.now + 5)
     metadata.as_non_indexable(true)
     assert_nil immudb.verified_set(key, "world", metadata: metadata)
+
     metadata.as_deleted(true)
+
     assert_raises(Immudb::VerificationError) do
       immudb.verified_set(key, "world", metadata: metadata)
     end
