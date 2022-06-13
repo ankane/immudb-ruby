@@ -40,10 +40,8 @@ class KeyTest < Minitest::Test
 
     key = random_key
     metadata = Immudb::KVMetadata.new
-    metadata.expires_at(Time.now + 1)
+    metadata.expires_at(Time.now)
     assert_nil immudb.verified_set(key, "world", metadata: metadata)
-
-    sleep(1)
 
     error = assert_raises(Immudb::Error) do
       immudb.verified_get(key)
