@@ -83,6 +83,8 @@ module Immudb
         end
       end
 
+      private
+
       def entry_spec_digest_v0(kv)
         md = Digest::SHA256.new
         md.update(kv.key)
@@ -113,8 +115,6 @@ module Immudb
         md.update(valmd.digest)
         md.digest
       end
-
-      private
 
       def leaf_for(d)
         b = LEAF_PREFIX + d
