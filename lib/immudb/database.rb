@@ -1,4 +1,4 @@
-# Copyright 2021 CodeNotary, Inc. All rights reserved.
+# Copyright 2022 CodeNotary, Inc. All rights reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,23 @@
 # limitations under the License.
 
 module Immudb
-  class LinearProof
-    attr_accessor :sourceTxID, :targetTxID, :terms
+  module Database
+    class << self
+      def wrap_with_prefix(b, prefix)
+        prefix + b
+      end
+
+      def encode_key(key)
+        wrap_with_prefix(key, SET_KEY_PREFIX)
+      end
+
+      def encode_entry_spec(key, md, value)
+        EntrySpec.new(
+          key: wrap_with_prefix(key, SET_KEY_PREFIX),
+          md: md,
+          value: wrap_with_prefix(value, PLAIN_VALUE_PREFIX)
+        )
+      end
+    end
   end
 end

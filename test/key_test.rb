@@ -8,16 +8,12 @@ class KeyTest < Minitest::Test
   end
 
   def test_verified_get_verified_set
-    skip unless verified_supported?
-
     key = random_key
     assert_nil immudb.verified_set(key, "world")
     assert_equal "world", immudb.verified_get(key)
   end
 
   def test_verified_get_verified_get_multiple_clients
-    skip unless verified_supported?
-
     key = random_key
     assert_nil immudb.verified_set(key, "world")
     assert_nil immudb2.verified_set(key, "world2")
@@ -46,11 +42,5 @@ class KeyTest < Minitest::Test
     immudb.set("#{prefix}2", "two")
     assert_equal ["#{prefix}1", "#{prefix}2"], immudb.scan(prefix: prefix).map { |v| v[:key] }
     assert_equal ["#{prefix}2", "#{prefix}1"], immudb.scan(prefix: prefix, desc: true).map { |v| v[:key] }
-  end
-
-  private
-
-  def verified_supported?
-    immudb.version.to_f < 1.2
   end
 end

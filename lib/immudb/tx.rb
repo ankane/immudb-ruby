@@ -12,35 +12,37 @@
 
 module Immudb
   class Tx
-    attr_accessor :ID, :Ts, :BlTxID, :BlRoot, :PrevAlh, :nentries, :entries, :htree, :Alh
+    attr_accessor :header, :entries, :htree
+
+    def initialize
+      @header = nil
+      @entries = nil
+      @htree = nil
+    end
+
+    def tx_entry_digest
+      if @header.version == 0
+        method(:tx_entry_digest_v1_1)
+      elsif @header.version == 1
+        method(:tx_entry_digest_v1_2)
+      else
+        raise VerificationError
+      end
+    end
 
     def build_hash_tree
       digests = []
+      tx_entry_digest = self.tx_entry_digest
       @entries.each do |e|
-        digests << e.digest
+        digests << tx_entry_digest.call(e)
       end
       @htree.build_with(digests)
+      root = @htree.root
+      @header.eh = root
     end
 
-    def calc_alh
-      calc_innerhash
-      bi = [@ID].pack("Q>") + @PrevAlh + @InnerHash
-      @Alh = Digest::SHA256.digest(bi)
-    end
-
-    def calc_innerhash
-      bj = [@Ts, @nentries].pack("Q>L>") + eh
-      bj += [@BlTxID].pack("Q>") + @BlRoot
-      @InnerHash = Digest::SHA256.digest(bj)
-    end
-
-    def eh
-      @htree.root
-    end
-
-    def proof(key)
+    def index_of(key)
       kindex = nil
-      # find index of element holding given key
       @entries.each_with_index do |v, k|
         if v.key == key
           kindex = k
@@ -48,9 +50,45 @@ module Immudb
         end
       end
       if kindex.nil?
-        raise KeyError
+        raise VerificationError
       end
-      @htree.inclusion_proof(kindex)
+      kindex
+    end
+
+    def proof(key)
+      kindex = index_of(key)
+      htree.inclusion_proof(kindex)
+    end
+
+    private
+
+    def tx_entry_digest_v1_1(e)
+      unless e.md.nil?
+        # TODO raise ErrMetadataUnsupported
+        raise VerificationError
+      end
+      md = Digest::SHA256.new
+      md.update(e.k)
+      md.update(e.hVal)
+      md.digest
+    end
+
+    def tx_entry_digest_v1_2(e)
+      mdbs = "".b
+      if !e.md.nil?
+        raise "Not supported yet"
+        # mdbs = e.md.Bytes()
+      end
+      mdLen = mdbs.length
+      b = "".b
+      b = b + [mdLen].pack("n")
+      b = b + mdbs
+      b = b + [e.kLen].pack("n")
+      b = b + e.k
+      md = Digest::SHA256.new
+      md.update(b)
+      md.update(e.hVal)
+      md.digest
     end
   end
 end

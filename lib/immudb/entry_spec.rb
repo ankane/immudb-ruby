@@ -1,4 +1,4 @@
-# Copyright 2021 CodeNotary, Inc. All rights reserved.
+# Copyright 2022 CodeNotary, Inc. All rights reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,13 @@
 # limitations under the License.
 
 module Immudb
-  class LinearProof
-    attr_accessor :sourceTxID, :targetTxID, :terms
+  class EntrySpec
+    attr_reader :key, :metadata, :value
+
+    def initialize(key:, md:, value:)
+      @key = key
+      @metadata = md
+      @value = value
+    end
   end
 end

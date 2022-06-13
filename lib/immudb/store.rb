@@ -13,62 +13,14 @@
 module Immudb
   class Store
     class << self
-      def tx_from(stx)
-        entries = []
-        stx.entries.each do |e|
-          i = TXe.new
-          i.h_value = digest_from(e.hValue)
-          # use len for off with latest proto
-          i.v_off = e.vLen
-          i.set_key(e.key)
-          entries << i
-        end
-        tx = new_tx_with_entries(entries)
-        tx.ID = stx.header.id
-        tx.PrevAlh = digest_from(stx.header.prevAlh)
-        tx.Ts = stx.header.ts
-        tx.BlTxID = stx.header.blTxId
-        tx.BlRoot = digest_from(stx.header.blRoot)
-        tx.build_hash_tree
-        tx.calc_alh
+      def new_tx_with_entries(header, entries)
+        htree = HTree.new(entries.length)
+
+        tx = Tx.new
+        tx.header = header
+        tx.entries = entries
+        tx.htree = htree
         tx
-      end
-
-      def tx_metadata_from(txmFrom)
-        txm = TxMetadata.new
-        txm.iD = txmFrom.id
-        txm.prevAlh = digest_from(txmFrom.prevAlh)
-        txm.ts = txmFrom.ts
-        txm.nEntries = txmFrom.nentries.to_i
-        txm.eh = digest_from(txmFrom.eH)
-        txm.blTxID = txmFrom.blTxId
-        txm.blRoot = digest_from(txmFrom.blRoot)
-        txm
-      end
-
-      def encode_key(key)
-        SET_KEY_PREFIX + key
-      end
-
-      def encode_kv(key, value)
-        KV.new(SET_KEY_PREFIX + key, PLAIN_VALUE_PREFIX + value)
-      end
-
-      def encode_reference(key, referencedKey, atTx)
-        refVal = REFERENCE_VALUE_PREFIX + [atTx].pack("Q>") + SET_KEY_PREFIX + referencedKey
-        KV.new(SET_KEY_PREFIX + key, refVal)
-      end
-
-      def linear_proof_from(lp)
-        LinearProof.new(lp.sourceTxId, lp.TargetTxId, lp.terms)
-      end
-
-      def digest_from(sliced_digest)
-        sliced_digest[0, 32]
-      end
-
-      def digests_from(sliced_terms)
-        sliced_terms.map(&:dup)
       end
 
       def verify_inclusion(proof, digest, root)
@@ -120,16 +72,49 @@ module Immudb
         end
       end
 
-      private
-
-      def new_tx_with_entries(entries)
-        tx = Tx.new
-        tx.ID = 0
-        tx.entries = entries
-        tx.nentries = entries.length
-        tx.htree = HTree.new(entries.length)
-        tx
+      def entry_spec_digest_for(version)
+        if version == 0
+          method(:entry_spec_digest_v0)
+        elsif version == 1
+          method(:entry_spec_digest_v1)
+        else
+          # TODO raise ErrUnsupportedTxVersion
+          raise VerificationError
+        end
       end
+
+      def entry_spec_digest_v0(kv)
+        md = Digest::SHA256.new
+        md.update(kv.key)
+        valmd = Digest::SHA256.new
+        valmd.update(kv.value)
+        md.update(valmd.digest)
+        md.digest
+      end
+
+      def entry_spec_digest_v1(kv)
+        mdbs = "".b
+        if !kv.metadata.nil?
+          raise "Not supported yet"
+          # mdbs = kv.metadata.Bytes()
+        end
+        mdLen = mdbs.length
+        kLen = kv.key.length
+        b = "".b
+        b = b + [mdLen].pack("n")
+        b = b + mdbs
+        b = b + [kLen].pack("n")
+        b = b + kv.key
+
+        md = Digest::SHA256.new
+        md.update(b)
+        valmd = Digest::SHA256.new
+        valmd.update(kv.value)
+        md.update(valmd.digest)
+        md.digest
+      end
+
+      private
 
       def leaf_for(d)
         b = LEAF_PREFIX + d
