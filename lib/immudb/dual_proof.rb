@@ -12,6 +12,6 @@
 
 module Immudb
   class DualProof
-    attr_accessor :sourceTxMetadata, :targetTxMetadata, :inclusionProof, :consistencyProof, :targetBlTxAlh, :lastInclusionProof, :linearProof
+    attr_accessor :sourceTxHeader, :targetTxHeader, :inclusionProof, :consistencyProof, :targetBlTxAlh, :lastInclusionProof, :linearProof
   end
 end

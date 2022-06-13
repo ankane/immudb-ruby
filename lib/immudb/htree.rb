@@ -106,8 +106,8 @@ module Immudb
 
     def self.dual_proof_from(dproof)
       dp = DualProof.new
-      dp.sourceTxMetadata = Store.tx_metadata_from(dproof.sourceTxMetadata)
-      dp.targetTxMetadata = Store.tx_metadata_from(dproof.targetTxMetadata)
+      dp.sourceTxHeader = Store.tx_metadata_from(dproof.sourceTxHeader)
+      dp.targetTxHeader = Store.tx_metadata_from(dproof.targetTxHeader)
       dp.inclusionProof = Store.digest_from(dproof.inclusionProof)
       # use digests_from?
       dp.consistencyProof = Store.digests_from(dproof.consistencyProof)

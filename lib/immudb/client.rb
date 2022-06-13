@@ -92,7 +92,7 @@ module Immudb
       unless verifies
         raise VerificationError
       end
-      if tx.eh != Store.digest_from(verifiable_tx.dualProof.targetTxMetadata.eH)
+      if tx.eh != Store.digest_from(verifiable_tx.dualProof.targetTxHeader.eH)
         raise VerificationError
       end
       if state.txId == 0
@@ -154,15 +154,15 @@ module Immudb
       end
 
       if state.txId <= vTx
-        eh = Store.digest_from(ventry.verifiableTx.dualProof.targetTxMetadata.eH)
+        eh = Store.digest_from(ventry.verifiableTx.dualProof.targetTxHeader.eH)
         source_id = state.txId
         source_alh = Store.digest_from(state.txHash)
         target_id = vTx
-        target_alh = dual_proof.targetTxMetadata.alh
+        target_alh = dual_proof.targetTxHeader.alh
       else
-        eh = Store.digest_from(ventry.verifiableTx.dualProof.sourceTxMetadata.eH)
+        eh = Store.digest_from(ventry.verifiableTx.dualProof.sourceTxHeader.eH)
         source_id = vTx
-        source_alh = dual_proof.sourceTxMetadata.alh
+        source_alh = dual_proof.sourceTxHeader.alh
         target_id = state.txId
         target_alh = store.digest_from(state.txHash)
       end

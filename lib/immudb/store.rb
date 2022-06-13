@@ -18,17 +18,17 @@ module Immudb
         stx.entries.each do |e|
           i = TXe.new
           i.h_value = digest_from(e.hValue)
-          i.v_off = e.vOff
-          i.value_len = e.vLen.to_i
+          # use len for off with latest proto
+          i.v_off = e.vLen
           i.set_key(e.key)
           entries << i
         end
         tx = new_tx_with_entries(entries)
-        tx.ID = stx.metadata.id
-        tx.PrevAlh = digest_from(stx.metadata.prevAlh)
-        tx.Ts = stx.metadata.ts
-        tx.BlTxID = stx.metadata.blTxId
-        tx.BlRoot = digest_from(stx.metadata.blRoot)
+        tx.ID = stx.header.id
+        tx.PrevAlh = digest_from(stx.header.prevAlh)
+        tx.Ts = stx.header.ts
+        tx.BlTxID = stx.header.blTxId
+        tx.BlRoot = digest_from(stx.header.blRoot)
         tx.build_hash_tree
         tx.calc_alh
         tx
@@ -92,29 +92,29 @@ module Immudb
       end
 
       def verify_dual_proof(proof, sourceTxID, targetTxID, sourceAlh, targetAlh)
-        if proof.nil? || proof.sourceTxMetadata.nil? || proof.targetTxMetadata.nil? || proof.sourceTxMetadata.iD != sourceTxID || proof.targetTxMetadata.iD != targetTxID
+        if proof.nil? || proof.sourceTxHeader.nil? || proof.targetTxHeader.nil? || proof.sourceTxHeader.iD != sourceTxID || proof.targetTxHeader.iD != targetTxID
           return false
         end
-        if proof.sourceTxMetadata.iD == 0 || proof.sourceTxMetadata.iD > proof.targetTxMetadata.iD
+        if proof.sourceTxHeader.iD == 0 || proof.sourceTxHeader.iD > proof.targetTxHeader.iD
           return false
         end
-        if sourceAlh != proof.sourceTxMetadata.alh
+        if sourceAlh != proof.sourceTxHeader.alh
           return false
         end
-        if targetAlh != proof.targetTxMetadata.alh
+        if targetAlh != proof.targetTxHeader.alh
           return false
         end
-        if sourceTxID < proof.targetTxMetadata.blTxID && !verify_inclusion_aht(proof.inclusionProof, sourceTxID, proof.targetTxMetadata.blTxID, leaf_for(sourceAlh), proof.targetTxMetadata.blRoot)
+        if sourceTxID < proof.targetTxHeader.blTxID && !verify_inclusion_aht(proof.inclusionProof, sourceTxID, proof.targetTxHeader.blTxID, leaf_for(sourceAlh), proof.targetTxHeader.blRoot)
           return false
         end
-        if proof.sourceTxMetadata.blTxID > 0 && !verify_consistency(proof.consistencyProof, proof.sourceTxMetadata.blTxID, proof.targetTxMetadata.blTxID, proof.sourceTxMetadata.blRoot, proof.targetTxMetadata.blRoot)
+        if proof.sourceTxHeader.blTxID > 0 && !verify_consistency(proof.consistencyProof, proof.sourceTxHeader.blTxID, proof.targetTxHeader.blTxID, proof.sourceTxHeader.blRoot, proof.targetTxHeader.blRoot)
           return false
         end
-        if proof.targetTxMetadata.blTxID > 0 && !verify_last_inclusion(proof.lastInclusionProof, proof.targetTxMetadata.blTxID, leaf_for(proof.targetBlTxAlh), proof.targetTxMetadata.blRoot)
+        if proof.targetTxHeader.blTxID > 0 && !verify_last_inclusion(proof.lastInclusionProof, proof.targetTxHeader.blTxID, leaf_for(proof.targetBlTxAlh), proof.targetTxHeader.blRoot)
           return false
         end
-        if sourceTxID < proof.targetTxMetadata.blTxID
-          verify_linear_proof(proof.linearProof, proof.targetTxMetadata.blTxID, targetTxID, proof.targetBlTxAlh, targetAlh)
+        if sourceTxID < proof.targetTxHeader.blTxID
+          verify_linear_proof(proof.linearProof, proof.targetTxHeader.blTxID, targetTxID, proof.targetBlTxAlh, targetAlh)
         else
           verify_linear_proof(proof.linearProof, sourceTxID, targetTxID, sourceAlh, targetAlh)
         end
