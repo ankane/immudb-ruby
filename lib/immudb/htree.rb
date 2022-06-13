@@ -95,26 +95,5 @@ module Immudb
         end
       end
     end
-
-    def self.inclusion_proof_from(iproof)
-      h = InclusionProof.new
-      h.leaf = iproof.leaf.to_i
-      h.width = iproof.width.to_i
-      h.terms = Store.digest_from(iproof.terms)
-      h
-    end
-
-    def self.dual_proof_from(dproof)
-      dp = DualProof.new
-      dp.sourceTxHeader = Store.tx_metadata_from(dproof.sourceTxHeader)
-      dp.targetTxHeader = Store.tx_metadata_from(dproof.targetTxHeader)
-      dp.inclusionProof = Store.digest_from(dproof.inclusionProof)
-      # use digests_from?
-      dp.consistencyProof = Store.digests_from(dproof.consistencyProof)
-      dp.targetBlTxAlh = Store.digest_from(dproof.targetBlTxAlh)
-      dp.lastInclusionProof = Store.digests_from(dproof.lastInclusionProof)
-      dp.linearProof = Store.linear_proof_from(dproof.linearProof)
-      dp
-    end
   end
 end
