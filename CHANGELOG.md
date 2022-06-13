@@ -1,4 +1,4 @@
-## 0.1.1 (unreleased)
+## 0.1.1 (2022-06-12)
 
 - Added support for verified methods with immudb 1.2.1+
 
