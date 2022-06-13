@@ -26,7 +26,6 @@ require "immudb/tx"
 require "immudb/tx_entry"
 require "immudb/tx_header"
 require "immudb/tx_metadata"
-require "immudb/txe"
 require "immudb/version"
 
 module Immudb
