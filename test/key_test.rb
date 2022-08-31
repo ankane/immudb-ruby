@@ -48,7 +48,7 @@ class KeyTest < Minitest::Test
     error = assert_raises(Immudb::Error) do
       immudb.verified_get(key)
     end
-    assert_equal "key not found: expired entry", error.message
+    assert_match "key not found: expired entry", error.message
   end
 
   def test_get_all_set_all
