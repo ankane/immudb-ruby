@@ -28,11 +28,11 @@ module Immudb
         database ||= uri.path.sub(/\A\//, "")
       end
 
-      host ||= "localhost"
-      port ||= 3322
-      username ||= "immudb"
-      password ||= "immudb"
-      database ||= "defaultdb"
+      host ||= ENV.fetch("IMMUDBHOST","localhost")
+      port ||= ENV.fetch("IMMUDBPORT","3322")
+      username ||= ENV.fetch("IMMUDBUSER","immudb")
+      password ||= ENV.fetch("IMMUDBPASS","immudb")
+      database ||= ENV.fetch("IMMUDBDATABASE","defaultdb")
 
       raise ArgumentError, "Invalid host" if host.include?(":")
 
