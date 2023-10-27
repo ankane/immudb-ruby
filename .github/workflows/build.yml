@@ -7,14 +7,14 @@ jobs:
       matrix:
         include:
           - ruby: 3.2
-            immudb: 1.4.1
+            immudb: 1.9DOM.0
           - ruby: 3.1
-            immudb: 1.2.1
+            immudb: 1.5.0
           - ruby: "3.0"
             immudb: 1.0.0
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}

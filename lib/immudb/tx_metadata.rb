@@ -22,5 +22,9 @@ module Immudb
       bi = bi + inner_hash
       Digest::SHA256.digest(bi)
     end
+
+    def bytes
+      nil
+    end
   end
 end

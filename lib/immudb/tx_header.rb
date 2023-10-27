@@ -38,6 +38,9 @@ module Immudb
         mdbs = "".b
         if !@metadata.nil?
           mdbs = @metadata.bytes
+          if mdbs.nil?
+            mdbs = "".b
+          end
         end
         md.update([mdbs.length].pack("n"))
         md.update(mdbs)
