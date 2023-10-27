@@ -1,4 +1,4 @@
-## 0.2.1 (unreleased)
+## 0.2.1 (2023-10-26)
 
 - Added support for immudb 1.9DOM
 
