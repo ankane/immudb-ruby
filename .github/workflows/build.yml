@@ -7,7 +7,7 @@ jobs:
       matrix:
         include:
           - ruby: 3.3
-            immudb: 1.9DOM.1
+            immudb: 1.9.4
           - ruby: 3.2
             immudb: 1.5.0
           - ruby: 3.1
