@@ -1,3 +1,7 @@
+## 0.3.0 (unreleased)
+
+- Dropped support for Ruby < 3.1
+
 ## 0.2.1 (2023-10-26)
 
 - Added support for immudb 1.9DOM

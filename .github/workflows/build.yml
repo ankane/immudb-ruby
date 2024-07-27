@@ -12,8 +12,6 @@ jobs:
             immudb: 1.5.0
           - ruby: 3.1
             immudb: 1.3.2
-          - ruby: "3.0"
-            immudb: 1.0.0
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
