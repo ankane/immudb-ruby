@@ -2,7 +2,7 @@
 
 Ruby client for [immudb](https://github.com/codenotary/immudb)
 
-[![Build Status](https://github.com/ankane/immudb-ruby/workflows/build/badge.svg?branch=master)](https://github.com/ankane/immudb-ruby/actions)
+[![Build Status](https://github.com/ankane/immudb-ruby/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/immudb-ruby/actions)
 
 ## Installation
 
