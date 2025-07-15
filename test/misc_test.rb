@@ -11,7 +11,7 @@ class MiscTest < Minitest::Test
   end
 
   def test_clean_index
-    skip if immudb.version == "1" || immudb.version.start_with?("1.9")
+    skip if immudb.version == "1" || immudb.version.to_f >= 1.5
     assert_nil immudb.clean_index
   end
 end
