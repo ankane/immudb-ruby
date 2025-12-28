@@ -6,6 +6,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - ruby: "4.0"
+            immudb: 1.10.0
           - ruby: 3.4
             immudb: 1.9.7
           - ruby: 3.3
