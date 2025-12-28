@@ -11,7 +11,9 @@ class MiscTest < Minitest::Test
   end
 
   def test_clean_index
-    skip if immudb.version == "1" || immudb.version.to_f >= 1.5
-    assert_nil immudb.clean_index
+    error = assert_raises(Immudb::Error) do
+      immudb.clean_index
+    end
+    assert_match "compaction threshold not yet reached", error.message
   end
 end
