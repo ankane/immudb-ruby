@@ -11,9 +11,13 @@ class MiscTest < Minitest::Test
   end
 
   def test_clean_index
-    error = assert_raises(Immudb::Error) do
-      immudb.clean_index
+    if Gem::Version.new(immudb.version) > Gem::Version.new("1.5")
+      error = assert_raises(Immudb::Error) do
+        immudb.clean_index
+      end
+      assert_match "compaction threshold not yet reached", error.message
+    else
+      assert_nil immudb.clean_index
     end
-    assert_match "compaction threshold not yet reached", error.message
   end
 end
