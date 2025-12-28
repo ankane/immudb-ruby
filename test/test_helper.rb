@@ -1,7 +1,6 @@
 require "bundler/setup"
 Bundler.require(:default)
 require "minitest/autorun"
-require "minitest/pride"
 
 Immudb::Client.new.create_database("testdb") rescue nil
 
