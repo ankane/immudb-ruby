@@ -11,7 +11,7 @@ class MiscTest < Minitest::Test
   end
 
   def test_clean_index
-    if Gem::Version.new(immudb.version) >= Gem::Version.new("1.5")
+    if Gem::Version.new(immudb.version.split("-").first) >= Gem::Version.new("1.9")
       error = assert_raises(Immudb::Error) do
         immudb.clean_index
       end
